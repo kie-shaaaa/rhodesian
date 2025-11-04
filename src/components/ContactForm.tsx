@@ -1,21 +1,29 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { CheckCircle, XCircle } from "lucide-react";
 
 const WEB3FORMS_API_KEY = import.meta.env.VITE_WEB3FORMS_API_KEY;
 
-type Status = "idle" | "loading" | "success" | "error";
+type Status = "idle" | "loading" | "success" | "error" | "rate-limited";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const form = e.currentTarget;
-    if (!form) return; // Safety check
+    if (!form) return;
+
+    
+    const lastSubmit = localStorage.getItem("lastSubmitTime");
+    const now = Date.now();
+    if (lastSubmit && now - parseInt(lastSubmit) < 30000) {
+      setStatus("rate-limited");
+      setTimeout(() => setStatus("idle"), 2000);
+      return;
+    }
 
     setStatus("loading");
-
     const formData = new FormData(form);
 
     try {
@@ -23,39 +31,54 @@ export default function ContactForm() {
         method: "POST",
         body: formData,
       });
-
       const result = await response.json();
 
       if (result.success) {
         setStatus("success");
-        form.reset(); // Safe reset
+        localStorage.setItem("lastSubmitTime", now.toString());
+        form.reset();
+        setTimeout(() => setStatus("idle"), 2000); // Auto-hide popup
       } else {
         setStatus("error");
+        setTimeout(() => setStatus("idle"), 2000);
       }
     } catch (err) {
       console.error(err);
       setStatus("error");
+      setTimeout(() => setStatus("idle"), 2000);
     }
   };
 
   return (
-    <div className="bg-gray-50 p-8 rounded-lg shadow-lg">
-      {status === "success" && (
-        <p className="mb-4 text-green-600 font-semibold">
-          Thank you! Your message has been sent.
-        </p>
-      )}
-      {status === "error" && (
-        <p className="mb-4 text-red-600 font-semibold">
-          Oops! Something went wrong. Please try again.
-        </p>
+    <div className="relative bg-gray-50 p-8 rounded-lg shadow-lg overflow-hidden">
+      {/* ✅ Popup Overlay */}
+      {(status === "success" || status === "error" || status === "rate-limited") && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm animate-fadeIn">
+          {status === "success" && (
+            <div className="flex flex-col items-center text-green-600">
+              <CheckCircle size={60} />
+              <p className="mt-2 font-semibold">Message Sent!</p>
+            </div>
+          )}
+          {status === "error" && (
+            <div className="flex flex-col items-center text-red-600">
+              <XCircle size={60} />
+              <p className="mt-2 font-semibold">Something went wrong!</p>
+            </div>
+          )}
+          {status === "rate-limited" && (
+            <div className="flex flex-col items-center text-yellow-600">
+              <XCircle size={60} />
+              <p className="mt-2 font-semibold">Please wait before sending again.</p>
+            </div>
+          )}
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Web3Forms hidden inputs */}
         <input type="hidden" name="access_key" value={WEB3FORMS_API_KEY} />
         <input type="hidden" name="subject" value="New Contact Form Submission" />
-        <input type="hidden" name="redirect" value="" />
 
         {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,12 +148,12 @@ export default function ContactForm() {
         {/* Submit */}
         <button
           type="submit"
+          disabled={status === "loading"}
           className={`w-full font-semibold px-6 py-3 rounded transition ${
             status === "loading"
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#f5c71d] hover:bg-[#d4ab0d] text-black"
           }`}
-          disabled={status === "loading"}
         >
           {status === "loading" ? "Sending..." : "Submit"}
         </button>

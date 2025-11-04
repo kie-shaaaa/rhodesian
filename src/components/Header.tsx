@@ -1,12 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../assets/logos/logo_company.png';
+
 export function Header() {
   const location = useLocation();
   return <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-gray-900">
-              Rhodesian Sales Corp.
+           <Link to="/" className="flex items-center space-x-2">
+              <img
+                src={logo}
+                alt="Rhodesian Logo"
+                className="h-10 w-10 object-contain"
+              />
+              <span className="text-xl font-bold text-gray-900">
+                Rhodesian Sales Corp.
+              </span>
             </Link>
           </div>
           <nav className="hidden md:flex space-x-8">
