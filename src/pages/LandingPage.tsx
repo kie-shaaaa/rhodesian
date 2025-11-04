@@ -1,6 +1,11 @@
 import { CheckCircleIcon, PackageIcon, TruckIcon, ShieldCheckIcon, MapPinIcon, PhoneIcon, MailIcon } from 'lucide-react';
 import ContactForm from '../components/ContactForm';
 
+import oilganicsLogo from '../assets/logos/oilganics.jpg';
+import doggiesLogo from '../assets/logos/doggies_choice.jpeg';
+import taichiLogo from '../assets/logos/taichi.jpg';
+import kuchiLogo from '../assets/logos/kuchi.jpg';
+
 export function LandingPage() {
   const stats = [
     { number: '3,800+', label: 'Active Retail Doors' },
@@ -15,13 +20,12 @@ export function LandingPage() {
     { icon: ShieldCheckIcon, title: 'Trusted Partner', description: '15 years of industry experience.' },
   ];
 
-  const products = [
-  { name: 'Oilganics', logo: '../src/assets/logos/oilganics.jpg' },
-  { name: "Doggies' Choice", logo: '../src/assets/logos/doggies_choice.jpeg' },
-  { name: 'Tai Chi', logo: '../src/assets/logos/taichi.jpg' },
-  { name: 'Kuchi Kuchi', logo: '../src/assets/logos/kuchi.jpg' },
+ const products = [
+  { name: 'Oilganics', logo: oilganicsLogo },
+  { name: "Doggies' Choice", logo: doggiesLogo },
+  { name: 'Tai Chi', logo: taichiLogo },
+  { name: 'Kuchi Kuchi', logo: kuchiLogo },
 ];
-
 
   return (
     <div className="flex flex-col">

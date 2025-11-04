@@ -1,17 +1,25 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logos/logo_company.png';
 
 export function Header() {
+  const navigate = useNavigate();
   const location = useLocation();
 
+  
   const handleContactClick = () => {
-    window.location.href = '/contact'; // forces full page reload
+    if (location.pathname === '/contact') {
+      
+      navigate('/contact', { replace: true });
+    } else {
+      navigate('/contact');
+    }
   };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
+          {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <img
@@ -24,6 +32,8 @@ export function Header() {
               </span>
             </Link>
           </div>
+
+          {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link
               to="/"
@@ -49,10 +59,18 @@ export function Header() {
             >
               Products
             </Link>
-            <a href="/contact" className="text-gray-700 hover:text-gray-900 transition">
+            
+            <button
+              onClick={handleContactClick}
+              className={`transition text-gray-700 hover:text-gray-900 ${
+                location.pathname === '/contact' ? 'font-semibold text-gray-900' : ''
+              }`}
+            >
               Contact
-            </a>
+            </button>
           </nav>
+
+          {/* Get in Touch button */}
           <button
             onClick={handleContactClick}
             className="bg-[#f5c71d] hover:bg-[#d4ab0d] text-black font-semibold px-6 py-2 rounded transition"
